@@ -6,5 +6,5 @@ import (
 )
 
 type Database interface {
-	GetAllUsers(ctx context.Context) ([]domain.User, error)
+	GetUsers(ctx context.Context) ([]domain.User, error)
 }
