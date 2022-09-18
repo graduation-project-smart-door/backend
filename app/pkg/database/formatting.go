@@ -10,7 +10,6 @@ func DatabaseParametersToDSN(engine string, host string, database string, user s
 	} else {
 		sslString = "disable"
 	}
-	fmt.Print(password)
 	return fmt.Sprintf("%s://%s:%s@%s/%s?sslmode=%s",
 		engine, user, password, host, database, sslString)
 }
