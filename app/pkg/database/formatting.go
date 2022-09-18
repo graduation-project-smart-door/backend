@@ -2,7 +2,15 @@ package database
 
 import "fmt"
 
-func DatabaseParametersToDSN(engine string, host string, database string, user string, password string) string {
+func DatabaseParametersToDSN(engine string, host string, database string, user string, password string, ssl bool) string {
 	// example: postgresql://localhost/mydb?user=other&password=secret
-	return fmt.Sprintf("%s://%s/%s?user=%s&password=%s", engine, host, database, user, password)
+	var sslString string
+	if ssl {
+		sslString = "enable"
+	} else {
+		sslString = "disable"
+	}
+	fmt.Print(password)
+	return fmt.Sprintf("%s://%s:%s@%s/%s?sslmode=%s",
+		engine, user, password, host, database, sslString)
 }
