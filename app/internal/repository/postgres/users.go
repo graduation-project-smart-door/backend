@@ -24,18 +24,16 @@ func (u *userModel) FromDomain(user domain.User) {
 	u.Surname = user.Surname
 	u.Patronymic = user.Patronymic
 	u.Role = user.Role
-	u.EncryptedPassword = user.EncryptedPassword
 }
 
 func userModelToDomain(model userModel) domain.User {
 	return domain.User{
-		ID:                model.ID,
-		Email:             model.Email,
-		Name:              model.Name,
-		Surname:           model.Surname,
-		Patronymic:        model.Patronymic,
-		Role:              model.Role,
-		EncryptedPassword: model.EncryptedPassword,
+		ID:         model.ID,
+		Email:      model.Email,
+		Name:       model.Name,
+		Surname:    model.Surname,
+		Patronymic: model.Patronymic,
+		Role:       model.Role,
 	}
 }
 
