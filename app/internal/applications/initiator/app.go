@@ -11,7 +11,9 @@ import (
 	"net"
 	"net/http"
 	"smart-door/app/internal/config"
+	"smart-door/app/internal/handlers/users"
 	"smart-door/app/internal/repository/postgres"
+	usersService "smart-door/app/internal/service/users"
 	"smart-door/app/pkg/database"
 	"time"
 )
@@ -29,8 +31,13 @@ func NewApp(cfg *config.Config, logger *zap.Logger) (*App, error) {
 	router := mux.NewRouter()
 
 	db := postgres.NewPostgresDatabase(database.DatabaseParametersToDSN("postgres", cfg.PostgreSQL.Host,
-		cfg.PostgreSQL.Database, cfg.PostgreSQL.Username, cfg.PostgreSQL.Password))
-	fmt.Print(db)
+		cfg.PostgreSQL.Database, cfg.PostgreSQL.Username, cfg.PostgreSQL.Password, false))
+
+	appUsersRepository := postgres.NewUsersRepository(db)
+	appUsersService := usersService.NewService(appUsersRepository, logger)
+	appHandlerUsers := users.NewUsersHandler(appUsersService)
+	appHandlerUsers.Register(router)
+
 	return &App{cfg: cfg, logger: logger, router: router}, nil
 }
 
