@@ -23,3 +23,11 @@ func (s *Service) GetListUsers(ctx context.Context) ([]domain.User, error) {
 	}
 	return users, nil
 }
+
+func (s *Service) CreateUser(ctx context.Context, user domain.User) error {
+	err := s.db.CreateUser(ctx, user)
+	if err != nil {
+
+	}
+	return nil
+}

@@ -25,3 +25,13 @@ func (u *UsersRepository) GetUsers(ctx context.Context) ([]domain.User, error) {
 	users := userModelsToDomain(usersModel)
 	return users, nil
 }
+
+func (u *UsersRepository) CreateUser(ctx context.Context, user domain.User) error {
+	model := userModel{}
+	model.FromDomain(user)
+	_, err := u.db.NewInsert().Model(&model).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
