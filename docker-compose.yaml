@@ -16,7 +16,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - 8005:8000
+      - 8000:8000
     volumes:
       - ./app:/opt/smart-door/app
       - ./.env:/opt/smart-door/.env
