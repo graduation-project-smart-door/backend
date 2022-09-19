@@ -20,6 +20,11 @@ type CreateUser struct {
 	Password   string `json:"password"`
 }
 
+type LoginUser struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 func (u *User) FromCreateUser(model CreateUser) {
 	u.Name = model.Name
 	u.Surname = model.Surname
@@ -35,4 +40,8 @@ func EncryptPassword(s string) (string, error) {
 	}
 
 	return string(b), nil
+}
+
+func ComparePassword(password string, encryptedPassword string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(encryptedPassword), []byte(password)) == nil
 }

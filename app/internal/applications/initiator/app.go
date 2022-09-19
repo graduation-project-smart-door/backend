@@ -14,6 +14,7 @@ import (
 	"smart-door/app/internal/handlers/users"
 	"smart-door/app/internal/repository/postgres"
 	usersService "smart-door/app/internal/service/users"
+	"smart-door/app/pkg/auth"
 	"smart-door/app/pkg/database"
 	"time"
 )
@@ -33,8 +34,12 @@ func NewApp(cfg *config.Config, logger *zap.Logger) (*App, error) {
 	db := postgres.NewPostgresDatabase(database.DatabaseParametersToDSN("postgres", cfg.PostgreSQL.Host,
 		cfg.PostgreSQL.Database, cfg.PostgreSQL.Username, cfg.PostgreSQL.Password, false))
 
+	tokenManager, err := auth.NewManager(cfg.SigningKey)
+	if err != nil {
+		logger.Error("error init token-manager", zap.Error(err))
+	}
 	appUsersRepository := postgres.NewUsersRepository(db)
-	appUsersService := usersService.NewService(appUsersRepository, logger)
+	appUsersService := usersService.NewService(appUsersRepository, logger, tokenManager)
 	appHandlerUsers := users.NewUsersHandler(appUsersService)
 	appHandlerUsers.Register(router)
 

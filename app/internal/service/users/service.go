@@ -2,17 +2,24 @@ package users
 
 import (
 	"context"
+	"errors"
 	"go.uber.org/zap"
 	"smart-door/app/internal/domain"
+	"smart-door/app/pkg/auth"
+	"time"
 )
 
 type Service struct {
-	db  Database
-	log *zap.Logger
+	db           Database
+	log          *zap.Logger
+	tokenManager *auth.Manager
 }
 
-func NewService(db Database, log *zap.Logger) *Service {
-	return &Service{db: db, log: log}
+// TODO: tokenTTL to config
+const tokenTTL = 48 * time.Hour
+
+func NewService(db Database, log *zap.Logger, tokenManager *auth.Manager) *Service {
+	return &Service{db: db, log: log, tokenManager: tokenManager}
 }
 
 func (s *Service) GetListUsers(ctx context.Context) ([]domain.User, error) {
@@ -36,4 +43,19 @@ func (s *Service) CreateUser(ctx context.Context, createUser domain.CreateUser) 
 		return user, err
 	}
 	return user, nil
+}
+
+func (s *Service) AuthorizationUser(ctx context.Context, loginUser domain.LoginUser) (string, error) {
+	ID, encryptedPassword, err := s.db.GetIDAndPasswordByEmail(ctx, loginUser.Email)
+	if err != nil {
+		return "", err
+	}
+	if !domain.ComparePassword(loginUser.Password, encryptedPassword) {
+		return "", errors.New("invalid email or password")
+	}
+	token, err := s.tokenManager.NewJWT(ID, 48*time.Hour)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }

@@ -2,6 +2,7 @@ package users
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 	"smart-door/app/internal/domain"
@@ -19,6 +20,7 @@ func NewUsersHandler(users Service) *Handler {
 func (h *Handler) Register(router *mux.Router) {
 	router.HandleFunc("/api/v1/users", h.listUsers).Methods("GET")
 	router.HandleFunc("/api/v1/users", h.registrationUser).Methods("POST")
+	router.HandleFunc("/api/v1/users/auth", h.authorizationUser).Methods("POST")
 }
 
 func (h *Handler) listUsers(w http.ResponseWriter, r *http.Request) {
@@ -44,4 +46,20 @@ func (h *Handler) registrationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.ResponseJson(w, newUser, http.StatusCreated)
+}
+
+func (h *Handler) authorizationUser(w http.ResponseWriter, r *http.Request) {
+	var rUser domain.LoginUser
+
+	if err := json.NewDecoder(r.Body).Decode(&rUser); err != nil {
+		h.ResponseErrorJson(w, "wrong data", http.StatusBadRequest)
+		return
+	}
+
+	token, err := h.users.AuthorizationUser(r.Context(), rUser)
+	if err != nil {
+		h.ResponseErrorJson(w, fmt.Sprint(err), http.StatusBadRequest)
+		return
+	}
+	h.ResponseJson(w, map[string]string{"token": token}, 200)
 }

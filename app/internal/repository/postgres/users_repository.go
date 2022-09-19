@@ -38,3 +38,16 @@ func (u *UsersRepository) CreateUser(ctx context.Context, user domain.User, pass
 	}
 	return userModelToDomain(model), nil
 }
+
+func (u *UsersRepository) GetIDAndPasswordByEmail(ctx context.Context, email string) (string, string, error) {
+	var password string
+	var id string
+
+	model := userModel{}
+	err := u.db.NewSelect().Model(&model).
+		Where("email = ?", email).Column("id", "encrypted_password").Scan(ctx, &id, &password)
+	if err != nil {
+		return "", "", err
+	}
+	return id, password, nil
+}

@@ -6,8 +6,9 @@ import (
 )
 
 type Config struct {
-	IsDebug       bool `env:"IS_DEBUG" env-default:"false"`
-	IsDevelopment bool `env:"IS_DEV" env-default:"false"`
+	IsDebug       bool   `env:"IS_DEBUG" env-default:"false"`
+	IsDevelopment bool   `env:"IS_DEV" env-default:"false"`
+	SigningKey    string `env:"SIGNING_KEY"`
 	Listen        struct {
 		BindIP string `env:"BIND_IP" env-default:"0.0.0.0"`
 		Port   string `env:"PORT" env-default:"8000"`
