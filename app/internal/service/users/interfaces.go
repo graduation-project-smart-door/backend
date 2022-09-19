@@ -7,5 +7,5 @@ import (
 
 type Database interface {
 	GetUsers(ctx context.Context) ([]domain.User, error)
-	CreateUser(ctx context.Context, user domain.User, password string) error
+	CreateUser(ctx context.Context, user domain.User, password string) (domain.User, error)
 }

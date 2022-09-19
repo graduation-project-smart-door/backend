@@ -27,14 +27,14 @@ func (u *UsersRepository) GetUsers(ctx context.Context) ([]domain.User, error) {
 	return users, nil
 }
 
-func (u *UsersRepository) CreateUser(ctx context.Context, user domain.User, password string) error {
+func (u *UsersRepository) CreateUser(ctx context.Context, user domain.User, password string) (domain.User, error) {
 	model := userModel{}
 	model.FromDomain(user)
 	model.ID = ulid.Make().String()
 	model.EncryptedPassword = password
 	_, err := u.db.NewInsert().Model(&model).Exec(ctx)
 	if err != nil {
-		return err
+		return userModelToDomain(userModel{}), err
 	}
-	return nil
+	return userModelToDomain(model), nil
 }

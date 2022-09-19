@@ -36,9 +36,12 @@ func (h *Handler) registrationUser(w http.ResponseWriter, r *http.Request) {
 		h.ResponseErrorJson(w, "wrong data", http.StatusBadRequest)
 		return
 	}
-	err := h.users.CreateUser(r.Context(), user)
+	newUser, err := h.users.CreateUser(r.Context(), user)
 	if err != nil {
+		h.ResponseErrorJson(w, "user is exists", http.StatusBadRequest)
 		return
 	}
-	h.ResponseJson(w, "created", http.StatusCreated)
+
+	// TODO: normal json
+	h.ResponseJson(w, newUser, http.StatusCreated)
 }

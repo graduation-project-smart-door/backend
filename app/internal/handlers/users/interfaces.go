@@ -7,5 +7,5 @@ import (
 
 type Service interface {
 	GetListUsers(ctx context.Context) ([]domain.User, error)
-	CreateUser(ctx context.Context, user domain.CreateUser) error
+	CreateUser(ctx context.Context, user domain.CreateUser) (domain.User, error)
 }
