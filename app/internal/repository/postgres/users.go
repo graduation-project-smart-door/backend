@@ -8,7 +8,7 @@ import (
 type userModel struct {
 	bun.BaseModel `bun:"table:users,alias:users,select:users"`
 
-	ID                int    `bun:"id,pk"`
+	ID                string `bun:"id,pk"`
 	Email             string `bun:"email,unique"`
 	Name              string `bun:"name"`
 	Surname           string `bun:"surname"`
