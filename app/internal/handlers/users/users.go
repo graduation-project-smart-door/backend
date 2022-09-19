@@ -31,7 +31,7 @@ func (h *Handler) listUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) registrationUser(w http.ResponseWriter, r *http.Request) {
-	var user domain.User
+	var user domain.CreateUser
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		h.ResponseErrorJson(w, "wrong data", http.StatusBadRequest)
 		return

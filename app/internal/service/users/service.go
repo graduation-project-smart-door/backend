@@ -24,10 +24,16 @@ func (s *Service) GetListUsers(ctx context.Context) ([]domain.User, error) {
 	return users, nil
 }
 
-func (s *Service) CreateUser(ctx context.Context, user domain.User) error {
-	err := s.db.CreateUser(ctx, user)
+func (s *Service) CreateUser(ctx context.Context, createUser domain.CreateUser) error {
+	user := domain.User{}
+	encryptedPassword, err := domain.EncryptPassword(createUser.Password)
 	if err != nil {
-
+		return err
+	}
+	user.FromCreateUser(createUser)
+	err = s.db.CreateUser(ctx, user, encryptedPassword)
+	if err != nil {
+		return err
 	}
 	return nil
 }
