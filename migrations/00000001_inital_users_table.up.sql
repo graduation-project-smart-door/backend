@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE TABLE users (
-       id BIGSERIAL NOT NULL PRIMARY KEY,
+       id TEXT NOT NULL PRIMARY KEY,
        email TEXT NOT NULL UNIQUE,
        name TEXT NOT NULL,
        surname TEXT NOT NULL,
