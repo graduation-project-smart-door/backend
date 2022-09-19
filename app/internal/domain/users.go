@@ -1,6 +1,10 @@
 package domain
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
+	"golang.org/x/crypto/bcrypt"
+)
 
 type User struct {
 	ID         string `json:"id"`
@@ -44,4 +48,12 @@ func EncryptPassword(s string) (string, error) {
 
 func ComparePassword(password string, encryptedPassword string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(encryptedPassword), []byte(password)) == nil
+}
+
+func (u *CreateUser) Validate() error {
+	return validation.ValidateStruct(
+		u,
+		validation.Field(&u.Email, validation.Required, is.Email),
+		validation.Field(&u.Password, validation.Length(6, 100)),
+	)
 }
