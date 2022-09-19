@@ -20,6 +20,7 @@ services:
     volumes:
       - ./app:/opt/smart-door/app
       - ./.env:/opt/smart-door/.env
+      - ./migrations:/opt/smart-door/migrations
     depends_on:
       - db
 
