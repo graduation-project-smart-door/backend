@@ -38,10 +38,10 @@ func (h *Handler) registrationUser(w http.ResponseWriter, r *http.Request) {
 	}
 	newUser, err := h.users.CreateUser(r.Context(), user)
 	if err != nil {
+		// TODO: normal errors
 		h.ResponseErrorJson(w, "user is exists", http.StatusBadRequest)
 		return
 	}
 
-	// TODO: normal json
 	h.ResponseJson(w, newUser, http.StatusCreated)
 }
