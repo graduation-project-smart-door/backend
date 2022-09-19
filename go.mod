@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/gorilla/mux v1.8.0
 	github.com/ilyakaznacheev/cleanenv v1.3.0
 	github.com/oklog/ulid/v2 v2.1.0
@@ -18,6 +19,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
