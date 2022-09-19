@@ -38,6 +38,10 @@ func (h *Handler) registrationUser(w http.ResponseWriter, r *http.Request) {
 		h.ResponseErrorJson(w, "wrong data", http.StatusBadRequest)
 		return
 	}
+	if err := user.Validate(); err != nil {
+		h.ResponseErrorJson(w, fmt.Sprint(err), http.StatusBadRequest)
+		return
+	}
 	newUser, err := h.users.CreateUser(r.Context(), user)
 	if err != nil {
 		// TODO: normal errors
