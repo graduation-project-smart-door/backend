@@ -3,13 +3,12 @@ package domain
 import "golang.org/x/crypto/bcrypt"
 
 type User struct {
-	ID                string `json:"id"`
-	Email             string `json:"email"`
-	Name              string `json:"name"`
-	Surname           string `json:"surname"`
-	Patronymic        string `json:"patronymic"`
-	Role              string `json:"role"`
-	EncryptedPassword string `json:"encrypted_password"`
+	ID         string `json:"id"`
+	Email      string `json:"email"`
+	Name       string `json:"name"`
+	Surname    string `json:"surname"`
+	Patronymic string `json:"patronymic"`
+	Role       string `json:"role"`
 }
 
 type CreateUser struct {
