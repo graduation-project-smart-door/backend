@@ -1,12 +1,18 @@
-FROM golang:1.19.1
+# Build project
+FROM golang:1.19.1-alpine as builder
 
-WORKDIR /opt/smart-door
+WORKDIR /build
+COPY go.mod .
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/build/app ./cmd/main.go
 
-ADD ./app /opt/smart-door/app
-COPY ./go.mod /opt/smart-door/
-COPY ./go.sum /opt/smart-door/
-COPY ./.env /opt/smart-door/
+# Run project
+FROM alpine:latest
 
-RUN go mod tidy
-RUN go build -o /app/build/app ./app/cmd/app/main.go
-CMD /app/build/app
+WORKDIR /opt/door
+
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /app/build/app /bin/main
+
+CMD /bin/main
