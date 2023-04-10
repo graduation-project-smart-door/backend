@@ -1,6 +1,8 @@
 package initiator
 
 import (
+	_ "smart-door/docs"
+
 	"context"
 	"errors"
 	"fmt"
@@ -14,6 +16,10 @@ import (
 	"net"
 	"net/http"
 	"smart-door/internal/config"
+	userPolicy "smart-door/internal/policy/user"
+	userRepository "smart-door/internal/repository/postgres/user"
+	userService "smart-door/internal/service/user"
+	userHandlers "smart-door/internal/transport/httpv1/user"
 	"smart-door/pkg/auth"
 	postgresClient "smart-door/pkg/client/postgres"
 	"time"
@@ -37,7 +43,8 @@ func NewApp(config *config.Config, logger *zap.Logger) (*App, error) {
 	postgresConfig := postgresClient.NewConfig(
 		config.PostgreSQL.Username, config.PostgreSQL.Password,
 		config.PostgreSQL.Host, config.PostgreSQL.Port, config.PostgreSQL.Database)
-	_, errInitPostgres := postgresClient.NewClient(context.Background(), 5, time.Second*5, postgresConfig)
+	database, errInitPostgres := postgresClient.NewClient(postgresConfig)
+
 	if errInitPostgres != nil {
 		logger.Fatal("create postgres client", zap.Error(errInitPostgres))
 	}
@@ -74,6 +81,15 @@ func NewApp(config *config.Config, logger *zap.Logger) (*App, error) {
 	if err != nil {
 		logger.Fatal("init auth manager", zap.Error(err))
 	}
+
+	// Пользователи
+	logger.Info("user handlers initializing")
+	appUserRouter := router.PathPrefix("/api/v1/users").Subrouter()
+	appUserRepository := userRepository.NewRepository(database)
+	appUserService := userService.NewService(logger, appUserRepository)
+	appUserPolicy := userPolicy.NewPolicy(appUserService)
+	appUserHandler := userHandlers.NewHandler(appUserPolicy)
+	appUserHandler.Register(appUserRouter)
 
 	return &App{config: config, logger: logger, router: router}, nil
 }
