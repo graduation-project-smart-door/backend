@@ -1,0 +1,68 @@
+definitions:
+  domain.User:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      patronymic:
+        type: string
+      person_id:
+        type: string
+      phone:
+        type: string
+      position:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.CreateUser:
+    properties:
+      first_name:
+        type: string
+      last_name:
+        type: string
+      patronymic:
+        type: string
+      person_id:
+        type: string
+      position:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/users:
+    post:
+      parameters:
+      - description: user info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.User'
+        "400":
+          description: Bad Request
+        "418":
+          description: I'm a teapot
+      summary: Creating a regular user
+      tags:
+      - Users
+swagger: "2.0"
