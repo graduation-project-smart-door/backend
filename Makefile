@@ -5,3 +5,7 @@ migrate:
 
 migrate.up:
 	migrate -path migrations -database ${DATABASE_URL} up
+
+.PHONY: swagger
+swagger:
+	swag init --parseDependency --parseInternal --parseDepth 1 -g ./cmd/main.go -o ./docs
