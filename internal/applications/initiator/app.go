@@ -1,20 +1,14 @@
 package initiator
 
 import (
-	_ "smart-door/docs"
-
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/redis/go-redis/v9"
-	"github.com/rs/cors"
-	httpSwagger "github.com/swaggo/http-swagger"
-	"go.uber.org/zap"
 	"net"
 	"net/http"
+	"time"
+
+	_ "smart-door/docs"
 	"smart-door/internal/config"
 	userPolicy "smart-door/internal/policy/user"
 	userRepository "smart-door/internal/repository/postgres/user"
@@ -22,17 +16,31 @@ import (
 	userHandlers "smart-door/internal/transport/httpv1/user"
 	"smart-door/pkg/auth"
 	postgresClient "smart-door/pkg/client/postgres"
-	"time"
+	"smart-door/pkg/logging"
+	"smart-door/pkg/tracer"
+
+	"github.com/gorilla/mux"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/redis/go-redis/v9"
+	"github.com/rs/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"go.uber.org/zap"
 )
 
 type App struct {
 	config     *config.Config
-	logger     *zap.Logger
+	logger     logging.Logger
 	router     *mux.Router
 	httpServer *http.Server
 }
 
-func NewApp(config *config.Config, logger *zap.Logger) (*App, error) {
+func NewApp(config *config.Config, logger logging.Logger) (*App, error) {
+	otelzap.L().Error("replaced zap's global loggers")
+	otelzap.Ctx(context.TODO()).Info("... and with context")
+
 	logger.Info("router initializing")
 	router := mux.NewRouter()
 
@@ -40,8 +48,7 @@ func NewApp(config *config.Config, logger *zap.Logger) (*App, error) {
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	logger.Info("database initializing")
-	postgresConfig := postgresClient.NewConfig(
-		config.PostgreSQL.Username, config.PostgreSQL.Password,
+	postgresConfig := postgresClient.NewConfig(config.PostgreSQL.Username, config.PostgreSQL.Password,
 		config.PostgreSQL.Host, config.PostgreSQL.Port, config.PostgreSQL.Database)
 	database, errInitPostgres := postgresClient.NewClient(postgresConfig)
 
@@ -81,6 +88,14 @@ func NewApp(config *config.Config, logger *zap.Logger) (*App, error) {
 	if err != nil {
 		logger.Fatal("init auth manager", zap.Error(err))
 	}
+
+	logger.Info("tracer initializing")
+	_, errNewTracer := tracer.NewTracer("http://localhost:14268/api/traces", "Smart Door")
+	if errNewTracer != nil {
+		logger.Fatal("failed tracer initializing", zap.Error(errNewTracer))
+	}
+
+	router.Use(otelmux.Middleware("my-server"))
 
 	// Пользователи
 	logger.Info("user handlers initializing")
