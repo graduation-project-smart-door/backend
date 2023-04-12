@@ -2,17 +2,19 @@ package user
 
 import (
 	"context"
+
 	"smart-door/internal/domain"
+	"smart-door/pkg/logging"
 
 	"go.uber.org/zap"
 )
 
 type Service struct {
-	logger *zap.Logger
+	logger logging.Logger
 	db     Repository
 }
 
-func NewService(logger *zap.Logger, db Repository) *Service {
+func NewService(logger logging.Logger, db Repository) *Service {
 	return &Service{logger: logger, db: db}
 }
 
