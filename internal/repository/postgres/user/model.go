@@ -2,8 +2,9 @@ package user
 
 import (
 	"database/sql"
-	"smart-door/internal/domain"
 	"time"
+
+	"smart-door/internal/domain"
 )
 
 type userModel struct {
@@ -24,20 +25,22 @@ type userModel struct {
 }
 
 func (model *userModel) FromDomain(user domain.User) {
+	// Обязательные поля
 	model.ID = user.ID
 	model.PersonID = user.PersonID
-	model.Email = model.stringToNullString(user.Email)
 	model.FirstName = user.FirstName
-	model.Patronymic = model.stringToNullString(user.Patronymic)
 	model.LastName = user.LastName
 	model.Role = user.Role
+	model.Position = user.Position
+	model.CreatedAt = user.CreatedAt
+	model.UpdatedAt = user.UpdatedAt
+
+	// Необязательные
 	model.Phone = model.stringToNullString(user.Phone)
 	model.Password = model.stringToNullString(user.Password)
 	model.Avatar = model.stringToNullString(user.Avatar)
-	model.Position = user.Position
-
-	model.CreatedAt = user.CreatedAt
-	model.UpdatedAt = user.UpdatedAt
+	model.Patronymic = model.stringToNullString(user.Patronymic)
+	model.Email = model.stringToNullString(user.Email)
 }
 
 func (model *userModel) stringToNullString(value string) sql.NullString {
@@ -45,7 +48,7 @@ func (model *userModel) stringToNullString(value string) sql.NullString {
 		return sql.NullString{String: value, Valid: true}
 	}
 
-	return sql.NullString{String: "", Valid: false}
+	return sql.NullString{}
 }
 
 func userModelToDomain(user userModel) *domain.User {
