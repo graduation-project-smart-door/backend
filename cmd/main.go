@@ -2,24 +2,27 @@ package main
 
 import (
 	"fmt"
-	"go.uber.org/zap"
-)
 
-import (
 	"smart-door/internal/applications/initiator"
 	"smart-door/internal/config"
 	"smart-door/pkg/logging"
 	"smart-door/pkg/migrations"
+
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
+	"go.uber.org/zap"
 )
 
 func main() {
-	logger, err := zap.NewProduction()
+	logger, err := zap.NewDevelopment()
 
 	if err != nil {
 		fmt.Errorf("failed to create logger: %v", err)
 	}
 	defer logger.Sync() //nolint:errcheck
 	appLogger := logging.NewLogger(logger, "benches")
+	undoLogger := otelzap.ReplaceGlobals(appLogger)
+	defer undoLogger()
+
 	logger.Info("config initializing")
 	cfg := config.GetConfig()
 	migrateManager := migrations.NewManager(fmt.Sprintf(
