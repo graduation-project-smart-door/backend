@@ -2,9 +2,10 @@ package user
 
 import (
 	"context"
+	"time"
+
 	"smart-door/internal/domain"
 	"smart-door/internal/repository/postgres"
-	"time"
 
 	"github.com/Masterminds/squirrel"
 )
@@ -37,14 +38,14 @@ func (repository *Repository) Create(ctx context.Context, user *domain.User) (*d
 			"role", "phone", "password", "avatar", "position",
 		).
 		Values(
-			user.PersonID,
-			user.Email,
-			user.FirstName,
-			user.Patronymic,
-			user.LastName, user.Role,
-			user.Phone, user.Password,
-			user.Avatar,
-			user.Position).
+			newUser.PersonID,
+			newUser.Email,
+			newUser.FirstName,
+			newUser.Patronymic,
+			newUser.LastName, newUser.Role,
+			newUser.Phone, newUser.Password,
+			newUser.Avatar,
+			newUser.Position).
 		Suffix("RETURNING \"id\"").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
