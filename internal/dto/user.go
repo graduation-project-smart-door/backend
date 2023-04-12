@@ -1,8 +1,9 @@
 package dto
 
 import (
-	"github.com/go-ozzo/ozzo-validation"
 	"smart-door/internal/domain"
+
+	"github.com/go-ozzo/ozzo-validation"
 )
 
 type CreateUser struct {
@@ -29,6 +30,6 @@ func (user *CreateUser) ToDomain() domain.User {
 		Patronymic: user.Patronymic,
 		LastName:   user.LastName,
 		Position:   user.Position,
-		Role:       "user",
+		Role:       domain.UserRole,
 	}
 }
