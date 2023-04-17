@@ -2,22 +2,23 @@ version: '3.8'
 
 services:
   web:
-    container_name: benches-web
+    container_name: smart-door-web
     build:
       context: ./
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./:/opt/benches/
+      - ./:/opt/smart-door/
     depends_on:
       - db
       - minio
       - redis
+    env_file: .env
 
   db:
     image: postgres:12.0-alpine
-    container_name: benches-db
+    container_name: smart-door-db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file: .env
