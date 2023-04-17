@@ -15,4 +15,6 @@ WORKDIR /opt/door
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /app/build/app /bin/main
 
+COPY .env .
+
 CMD /bin/main
