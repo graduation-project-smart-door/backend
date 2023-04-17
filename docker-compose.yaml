@@ -9,7 +9,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./:/opt/smart-door/
+      - ./:/opt/door/
     depends_on:
       - db
       - minio
