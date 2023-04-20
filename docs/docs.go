@@ -37,14 +37,56 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/domain.User"
                         }
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
+                    },
+                    "418": {
+                        "description": "I'm a teapot"
+                    }
+                }
+            }
+        },
+        "/api/v1/users/recognize": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Recognize user",
+                "parameters": [
+                    {
+                        "description": "event info",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RecognizeUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Event"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
                     },
                     "418": {
                         "description": "I'm a teapot"
@@ -54,6 +96,37 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "apperror.AppError": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Event": {
+            "type": "object",
+            "properties": {
+                "direction": {
+                    "type": "string"
+                },
+                "event_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "domain.User": {
             "type": "object",
             "properties": {
@@ -95,6 +168,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CreateEvent": {
+            "type": "object",
+            "properties": {
+                "direction": {
+                    "type": "string"
+                },
+                "event_time": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.CreateUser": {
             "type": "object",
             "properties": {
@@ -111,6 +198,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "position": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RecognizeUser": {
+            "type": "object",
+            "properties": {
+                "direction": {
+                    "type": "string"
+                },
+                "event_time": {
+                    "type": "string"
+                },
+                "person_id": {
                     "type": "string"
                 }
             }
