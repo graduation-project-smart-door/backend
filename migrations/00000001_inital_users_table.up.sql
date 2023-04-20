@@ -4,7 +4,7 @@ CREATE TYPE roles AS ENUM ('admin', 'superadmin', 'user');
 
 CREATE TABLE users (
        id SERIAL PRIMARY KEY,
-       person_id TEXT NOT NULL,
+       person_id UUID NOT NULL,
        email TEXT UNIQUE,
        first_name TEXT NOT NULL,
        patronymic TEXT,
