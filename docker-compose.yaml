@@ -36,7 +36,7 @@ services:
       - /bin/sh
       - -c
       - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
-    container_name: benches-redis
+    container_name: smart-door-redis
     volumes:
       - redis_data:/bitnami/redis/data
     ports:

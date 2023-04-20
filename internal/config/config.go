@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/ilyakaznacheev/cleanenv"
 	"log"
+
+	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type Config struct {
@@ -30,7 +31,7 @@ type Config struct {
 		Endpoint  string `env:"MINIO_ENDPOINT" env-default:"minio:9000"`
 		AccessKey string `env:"MINIO_ACCESS_KEY"`
 		SecretKey string `env:"MINIO_SECRET_KEY"`
-		Bucket    string `env:"MINIO_BUCKET" env-default:"benches"`
+		Bucket    string `env:"MINIO_BUCKET" env-default:"smart-door"`
 		UseSSL    bool   `env:"MINIO_USE_SSL" env-default:"true"`
 	}
 
