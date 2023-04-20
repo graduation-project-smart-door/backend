@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/json"
 	"net/http"
+
 	"smart-door/internal/apperror"
 	"smart-door/internal/dto"
 	"smart-door/internal/transport/httpv1"
@@ -23,6 +24,7 @@ func NewHandler(policy Policy) *Handler {
 
 func (handler *Handler) Register(router *mux.Router) {
 	router.HandleFunc("", apperror.Middleware(handler.createUser)).Methods("POST")
+	router.HandleFunc("/recognize", apperror.Middleware(handler.recognizeUser)).Methods("POST")
 }
 
 // @Summary Creating a regular user
@@ -30,13 +32,13 @@ func (handler *Handler) Register(router *mux.Router) {
 // @Produce json
 // @Param user body dto.CreateUser true "user info"
 // @Success 200 {object} domain.User
-// @Failure 400
+// @Failure 400 {object} apperror.AppError
 // @Failure 418
 // @Router /api/v1/users [post]
 func (handler *Handler) createUser(writer http.ResponseWriter, request *http.Request) error {
 	var user dto.CreateUser
 	if err := json.NewDecoder(request.Body).Decode(&user); err != nil {
-		return apperror.ErrIncorrectDataAuth
+		return apperror.ErrDecodeData
 	}
 
 	// Валидация
@@ -51,5 +53,35 @@ func (handler *Handler) createUser(writer http.ResponseWriter, request *http.Req
 	}
 
 	handler.ResponseJSON(writer, newUser, http.StatusCreated)
+	return nil
+}
+
+// @Summary Recognize user
+// @Tags Users
+// @Produce json
+// @Param user body dto.RecognizeUser true "event info"
+// @Success 200 {object} domain.Event
+// @Failure 400 {object} apperror.AppError
+// @Failure 418
+// @Router /api/v1/users/recognize [post]
+func (handler *Handler) recognizeUser(writer http.ResponseWriter, request *http.Request) error {
+	var user dto.RecognizeUser
+
+	if err := json.NewDecoder(request.Body).Decode(&user); err != nil {
+		return apperror.ErrDecodeData
+	}
+
+	// Валидация
+	if err := user.Validate(); err != nil {
+		details, _ := json.Marshal(err)
+		return apperror.NewAppError(err, "validation error", details)
+	}
+
+	newEvent, errCreateEvent := handler.policy.CreateEvent(request.Context(), user.ToDomain(), user.PersonID)
+	if errCreateEvent != nil {
+		return apperror.ErrFailedToCreate
+	}
+
+	handler.ResponseJSON(writer, newEvent, http.StatusCreated)
 	return nil
 }

@@ -5,11 +5,13 @@ import (
 	"time"
 
 	"smart-door/internal/domain"
+
+	"github.com/google/uuid"
 )
 
 type userModel struct {
 	ID         int            `db:"id"`
-	PersonID   string         `db:"person_id"`
+	PersonID   uuid.UUID      `db:"person_id"`
 	Email      sql.NullString `db:"email"`
 	FirstName  string         `db:"first_name"`
 	Patronymic sql.NullString `db:"patronymic"`

@@ -2,12 +2,16 @@ package user
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
+	"smart-door/internal/apperror"
 	"smart-door/internal/domain"
 	"smart-door/internal/repository/postgres"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/google/uuid"
 )
 
 const (
@@ -62,4 +66,40 @@ func (repository *Repository) Create(ctx context.Context, user *domain.User) (*d
 
 	newUser.ID = userID
 	return userModelToDomain(newUser), nil
+}
+
+func (repository *Repository) GetByPersonID(ctx context.Context, personID uuid.UUID) (*domain.User, error) {
+	query, args, errToSQL := repository.queryBuilder.Select("id").
+		Columns("person_id", "email", "first_name", "patronymic", "last_name",
+			"role", "phone", "password", "avatar", "position").
+		From(tableScheme).
+		Where(squirrel.Eq{"person_id": personID}).ToSql()
+
+	if errToSQL != nil {
+		return nil, errToSQL
+	}
+
+	var user userModel
+	err := repository.client.QueryRow(query, args...).Scan(
+		&user.ID,
+		&user.PersonID,
+		&user.Email,
+		&user.FirstName,
+		&user.Patronymic,
+		&user.LastName,
+		&user.Role,
+		&user.Phone,
+		&user.Password,
+		&user.Avatar,
+		&user.Position,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, apperror.ErrNotFound
+		}
+		return nil, err
+	}
+
+	return userModelToDomain(user), nil
 }
