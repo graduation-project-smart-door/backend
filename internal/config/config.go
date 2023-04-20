@@ -7,11 +7,15 @@ import (
 )
 
 type Config struct {
-	SigningKey string `env:"SIGNING_KEY"`
-
 	AppConfig struct {
-		LifetimeAccessTokenMinutes  int `env:"LIFETIME_ACCESS_TOKEN_MINUTES" env-default:"15"`
-		LifetimeRefreshTokenMinutes int `env:"LIFETIME_REFRESH_TOKEN_MINUTES" env-default:"30"`
+		SigningKey                  string `env:"SIGNING_KEY"`
+		IsDev                       bool   `env:"IS_DEV"`
+		LifetimeAccessTokenMinutes  int    `env:"LIFETIME_ACCESS_TOKEN_MINUTES" env-default:"15"`
+		LifetimeRefreshTokenMinutes int    `env:"LIFETIME_REFRESH_TOKEN_MINUTES" env-default:"30"`
+	}
+
+	TelegramBot struct {
+		BaseURL string `env:"TELEGRAM_BOT_BASE_URL"`
 	}
 
 	Listen struct {
