@@ -1,4 +1,24 @@
 definitions:
+  apperror.AppError:
+    properties:
+      details:
+        items:
+          type: integer
+        type: array
+      message:
+        type: string
+    type: object
+  domain.Event:
+    properties:
+      direction:
+        type: string
+      event_time:
+        type: string
+      id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
   domain.User:
     properties:
       avatar:
@@ -26,6 +46,15 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.CreateEvent:
+    properties:
+      direction:
+        type: string
+      event_time:
+        type: string
+      user_id:
+        type: integer
+    type: object
   dto.CreateUser:
     properties:
       first_name:
@@ -37,6 +66,15 @@ definitions:
       person_id:
         type: string
       position:
+        type: string
+    type: object
+  dto.RecognizeUser:
+    properties:
+      direction:
+        type: string
+      event_time:
+        type: string
+      person_id:
         type: string
     type: object
 info:
@@ -54,15 +92,42 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/domain.User'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/apperror.AppError'
         "418":
           description: I'm a teapot
       summary: Creating a regular user
+      tags:
+      - Users
+  /api/v1/users/recognize:
+    post:
+      parameters:
+      - description: event info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RecognizeUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Event'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/apperror.AppError'
+        "418":
+          description: I'm a teapot
+      summary: Recognize user
       tags:
       - Users
 swagger: "2.0"

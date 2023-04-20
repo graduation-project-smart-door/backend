@@ -11,7 +11,9 @@ import (
 	_ "smart-door/docs"
 	"smart-door/internal/config"
 	userPolicy "smart-door/internal/policy/user"
+	eventRepository "smart-door/internal/repository/postgres/event"
 	userRepository "smart-door/internal/repository/postgres/user"
+	eventService "smart-door/internal/service/event"
 	userService "smart-door/internal/service/user"
 	userHandlers "smart-door/internal/transport/httpv1/user"
 	"smart-door/pkg/auth"
@@ -96,13 +98,17 @@ func NewApp(config *config.Config, logger logging.Logger) (*App, error) {
 	}
 
 	router.Use(otelmux.Middleware("my-server"))
+	// События
+	logger.Info("event application initializing")
+	appEventRepository := eventRepository.NewRepository(database)
+	appEventService := eventService.NewService(logger, appEventRepository)
 
 	// Пользователи
-	logger.Info("user handlers initializing")
+	logger.Info("user application initializing")
 	appUserRouter := router.PathPrefix("/api/v1/users").Subrouter()
 	appUserRepository := userRepository.NewRepository(database)
 	appUserService := userService.NewService(logger, appUserRepository)
-	appUserPolicy := userPolicy.NewPolicy(appUserService)
+	appUserPolicy := userPolicy.NewPolicy(appUserService, appEventService)
 	appUserHandler := userHandlers.NewHandler(appUserPolicy)
 	appUserHandler.Register(appUserRouter)
 
@@ -114,7 +120,8 @@ func (app *App) startHTTP() {
 
 	var listener net.Listener
 
-	app.logger.Info(fmt.Sprintf("bind application to host: %s and port: %s", app.config.Listen.BindIP, app.config.Listen.Port))
+	app.logger.Info(fmt.Sprintf("bind application to host: %s and port: %s",
+		app.config.Listen.BindIP, app.config.Listen.Port))
 	var err error
 	listener, err = net.Listen("tcp", fmt.Sprintf("%s:%s", app.config.Listen.BindIP, app.config.Listen.Port))
 	if err != nil {
@@ -122,10 +129,12 @@ func (app *App) startHTTP() {
 	}
 
 	c := cors.New(cors.Options{
-		AllowedMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodOptions, http.MethodDelete},
-		AllowedOrigins:     []string{"http://localhost:3000", "http://localhost:8080"},
-		AllowCredentials:   true,
-		AllowedHeaders:     []string{"Location", "Charset", "Access-Control-Allow-Origin", "Content-Type", "content-type", "Origin", "Accept", "Content-Length", "Accept-Encoding", "X-CSRF-Token"},
+		AllowedMethods: []string{http.MethodGet, http.MethodPost,
+			http.MethodPatch, http.MethodPut, http.MethodOptions, http.MethodDelete},
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:8080"},
+		AllowCredentials: true,
+		AllowedHeaders: []string{"Location", "Charset", "Access-Control-Allow-Origin", "Content-Type",
+			"content-type", "Origin", "Accept", "Content-Length", "Accept-Encoding", "X-CSRF-Token"},
 		OptionsPassthrough: true,
 		ExposedHeaders:     []string{"Location", "Authorization", "Content-Disposition"},
 		Debug:              false,
