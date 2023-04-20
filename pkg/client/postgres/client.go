@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/uptrace/opentelemetry-go-extra/otelsql"
+	"github.com/uptrace/opentelemetry-go-extra/otelsqlx"
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 )
 
 type Client interface {
@@ -41,7 +43,9 @@ func NewClient(cfg *config) (Client, error) {
 		cfg.Host, cfg.Port, cfg.Database, "disable",
 	)
 
-	db, errConnect := sqlx.Connect("postgres", dsn)
+	db, errConnect := otelsqlx.Open("postgres", dsn,
+		otelsql.WithAttributes(semconv.DBSystemPostgreSQL),
+		otelsql.WithDBName(cfg.Database))
 	if errConnect != nil {
 		log.Fatalf("Failed conntction to database: %v\n", errConnect)
 		return nil, errConnect
