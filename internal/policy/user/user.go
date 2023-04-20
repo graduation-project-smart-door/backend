@@ -4,17 +4,19 @@ import (
 	"context"
 
 	"smart-door/internal/domain"
+	"smart-door/internal/dto"
 
 	"github.com/google/uuid"
 )
 
 type Policy struct {
-	userService  UserService
-	eventService EventService
+	userService        UserService
+	eventService       EventService
+	telegramBotService TelegramBotService
 }
 
-func NewPolicy(userService UserService, eventService EventService) *Policy {
-	return &Policy{userService: userService, eventService: eventService}
+func NewPolicy(userService UserService, eventService EventService, telegramBotService TelegramBotService) *Policy {
+	return &Policy{userService: userService, eventService: eventService, telegramBotService: telegramBotService}
 }
 
 func (policy *Policy) CreateUser(ctx context.Context, user domain.User) (*domain.User, error) {
@@ -28,5 +30,21 @@ func (policy *Policy) CreateEvent(ctx context.Context, event domain.Event, perso
 	}
 
 	event.UserID = user.ID
-	return policy.eventService.CreateEvent(ctx, event)
+	newEvent, errCreateEvent := policy.eventService.CreateEvent(ctx, event)
+	if errCreateEvent != nil {
+		return newEvent, errCreateEvent
+	}
+
+	_, errSendNotification := policy.telegramBotService.SendNotification(
+		dto.NewEventNotification(
+			user.FirstName,
+			user.LastName,
+			event.Direction,
+		),
+	)
+	if errSendNotification != nil {
+		return newEvent, errSendNotification
+	}
+
+	return newEvent, nil
 }
