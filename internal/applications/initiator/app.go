@@ -14,6 +14,7 @@ import (
 	eventRepository "smart-door/internal/repository/postgres/event"
 	userRepository "smart-door/internal/repository/postgres/user"
 	eventService "smart-door/internal/service/event"
+	"smart-door/internal/service/telegrambot"
 	userService "smart-door/internal/service/user"
 	userHandlers "smart-door/internal/transport/httpv1/user"
 	"smart-door/pkg/auth"
@@ -86,7 +87,7 @@ func NewApp(config *config.Config, logger logging.Logger) (*App, error) {
 		DB:       config.Redis.DB,
 	})
 
-	_, err = auth.NewManager(config.SigningKey)
+	_, err = auth.NewManager(config.AppConfig.SigningKey)
 	if err != nil {
 		logger.Fatal("init auth manager", zap.Error(err))
 	}
@@ -98,6 +99,15 @@ func NewApp(config *config.Config, logger logging.Logger) (*App, error) {
 	}
 
 	router.Use(otelmux.Middleware("my-server"))
+
+	logger.Info("telegram bot initializing")
+	var telegramBot telegrambot.ITelegramBot
+
+	telegramBot = telegrambot.NewTelegramBot(config.TelegramBot.BaseURL, logger)
+	if config.AppConfig.IsDev {
+		telegramBot = telegrambot.NewTelegramBotMock(config.TelegramBot.BaseURL, logger)
+	}
+
 	// События
 	logger.Info("event application initializing")
 	appEventRepository := eventRepository.NewRepository(database)
@@ -108,7 +118,7 @@ func NewApp(config *config.Config, logger logging.Logger) (*App, error) {
 	appUserRouter := router.PathPrefix("/api/v1/users").Subrouter()
 	appUserRepository := userRepository.NewRepository(database)
 	appUserService := userService.NewService(logger, appUserRepository)
-	appUserPolicy := userPolicy.NewPolicy(appUserService, appEventService)
+	appUserPolicy := userPolicy.NewPolicy(appUserService, appEventService, telegramBot)
 	appUserHandler := userHandlers.NewHandler(appUserPolicy)
 	appUserHandler.Register(appUserRouter)
 
