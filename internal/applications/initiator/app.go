@@ -93,7 +93,7 @@ func NewApp(config *config.Config, logger logging.Logger) (*App, error) {
 	}
 
 	logger.Info("tracer initializing")
-	_, errNewTracer := tracer.NewTracer("http://localhost:14268/api/traces", "Smart Door")
+	_, errNewTracer := tracer.NewTracer(config.Jaeger.BaseURL, "Smart Door")
 	if errNewTracer != nil {
 		logger.Fatal("failed tracer initializing", zap.Error(errNewTracer))
 	}

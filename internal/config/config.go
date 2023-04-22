@@ -45,6 +45,10 @@ type Config struct {
 		DB       int    `env:"REDIS_DB" env-default:"0"`
 	}
 
+	Jaeger struct {
+		BaseURL string `env:"JAEGER_BASE_URL" env-default:"http://localhost:14268/api/traces"`
+	}
+
 	Images struct {
 		PublicEndpoint string `env:"IMAGES_PUBLIC_ENDPOINT" env-default:"http://localhost:9000"`
 	}
