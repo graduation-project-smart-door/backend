@@ -40,5 +40,5 @@ func main() {
 		appLogger.Fatal("Error create app", zap.Error(err))
 	}
 	logger.Info("running application")
-	a.Run()
+	a.Run(cfg)
 }

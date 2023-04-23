@@ -8,10 +8,11 @@ import (
 
 type Config struct {
 	AppConfig struct {
-		SigningKey                  string `env:"SIGNING_KEY"`
-		IsDev                       bool   `env:"IS_DEV"`
-		LifetimeAccessTokenMinutes  int    `env:"LIFETIME_ACCESS_TOKEN_MINUTES" env-default:"15"`
-		LifetimeRefreshTokenMinutes int    `env:"LIFETIME_REFRESH_TOKEN_MINUTES" env-default:"30"`
+		SigningKey                  string   `env:"SIGNING_KEY"`
+		IsDev                       bool     `env:"IS_DEV"`
+		LifetimeAccessTokenMinutes  int      `env:"LIFETIME_ACCESS_TOKEN_MINUTES" env-default:"15"`
+		LifetimeRefreshTokenMinutes int      `env:"LIFETIME_REFRESH_TOKEN_MINUTES" env-default:"30"`
+		AllowedOrigins              []string `env:"ALLOWED_ORIGINS" env-default:"http://localhost:3000,http://localhost:8080"`
 	}
 
 	TelegramBot struct {

@@ -125,7 +125,7 @@ func NewApp(config *config.Config, logger logging.Logger) (*App, error) {
 	return &App{config: config, logger: logger, router: router}, nil
 }
 
-func (app *App) startHTTP() {
+func (app *App) startHTTP(config *config.Config) {
 	app.logger.Info("start HTTP")
 
 	var listener net.Listener
@@ -141,7 +141,7 @@ func (app *App) startHTTP() {
 	c := cors.New(cors.Options{
 		AllowedMethods: []string{http.MethodGet, http.MethodPost,
 			http.MethodPatch, http.MethodPut, http.MethodOptions, http.MethodDelete},
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:8080"},
+		AllowedOrigins:   config.AppConfig.AllowedOrigins,
 		AllowCredentials: true,
 		AllowedHeaders: []string{"Location", "Charset", "Access-Control-Allow-Origin", "Content-Type",
 			"content-type", "Origin", "Accept", "Content-Length", "Accept-Encoding", "X-CSRF-Token"},
@@ -174,6 +174,6 @@ func (app *App) startHTTP() {
 	}
 }
 
-func (app *App) Run() {
-	app.startHTTP()
+func (app *App) Run(config *config.Config) {
+	app.startHTTP(config)
 }
