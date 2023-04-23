@@ -19,6 +19,10 @@ type Config struct {
 		BaseURL string `env:"TELEGRAM_BOT_BASE_URL"`
 	}
 
+	DoorService struct {
+		BaseURL string `env:"DOOR_BASE_URL"`
+	}
+
 	Listen struct {
 		BindIP string `env:"BIND_IP" env-default:"0.0.0.0"`
 		Port   string `env:"PORT" env-default:"8000"`

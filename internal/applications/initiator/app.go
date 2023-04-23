@@ -13,6 +13,7 @@ import (
 	userPolicy "smart-door/internal/policy/user"
 	eventRepository "smart-door/internal/repository/postgres/event"
 	userRepository "smart-door/internal/repository/postgres/user"
+	doorService "smart-door/internal/service/door"
 	eventService "smart-door/internal/service/event"
 	"smart-door/internal/service/telegrambot"
 	userService "smart-door/internal/service/user"
@@ -101,11 +102,19 @@ func NewApp(config *config.Config, logger logging.Logger) (*App, error) {
 	router.Use(otelmux.Middleware("my-server"))
 
 	logger.Info("telegram bot initializing")
-	var telegramBot telegrambot.ITelegramBot
+	var telegramBot TelegramBot
 
 	telegramBot = telegrambot.NewTelegramBot(config.TelegramBot.BaseURL, logger)
 	if config.AppConfig.IsDev {
 		telegramBot = telegrambot.NewTelegramBotMock(config.TelegramBot.BaseURL, logger)
+	}
+
+	logger.Info("door service initializing")
+	var appDoorService DoorService
+
+	appDoorService = doorService.NewService(logger, config.DoorService.BaseURL)
+	if config.AppConfig.IsDev {
+		appDoorService = doorService.NewServiceMock(logger, config.DoorService.BaseURL)
 	}
 
 	// События
@@ -118,7 +127,7 @@ func NewApp(config *config.Config, logger logging.Logger) (*App, error) {
 	appUserRouter := router.PathPrefix("/api/v1/users").Subrouter()
 	appUserRepository := userRepository.NewRepository(database)
 	appUserService := userService.NewService(logger, appUserRepository)
-	appUserPolicy := userPolicy.NewPolicy(appUserService, appEventService, telegramBot)
+	appUserPolicy := userPolicy.NewPolicy(appUserService, appEventService, telegramBot, appDoorService)
 	appUserHandler := userHandlers.NewHandler(appUserPolicy)
 	appUserHandler.Register(appUserRouter)
 

@@ -13,10 +13,20 @@ type Policy struct {
 	userService        UserService
 	eventService       EventService
 	telegramBotService TelegramBotService
+	doorService        DoorService
 }
 
-func NewPolicy(userService UserService, eventService EventService, telegramBotService TelegramBotService) *Policy {
-	return &Policy{userService: userService, eventService: eventService, telegramBotService: telegramBotService}
+func NewPolicy(
+	userService UserService,
+	eventService EventService,
+	telegramBotService TelegramBotService,
+	doorService DoorService) *Policy {
+	return &Policy{
+		userService:        userService,
+		eventService:       eventService,
+		telegramBotService: telegramBotService,
+		doorService:        doorService,
+	}
 }
 
 func (policy *Policy) CreateUser(ctx context.Context, user domain.User) (*domain.User, error) {
@@ -33,6 +43,11 @@ func (policy *Policy) CreateEvent(ctx context.Context, event domain.Event, perso
 	newEvent, errCreateEvent := policy.eventService.CreateEvent(ctx, event)
 	if errCreateEvent != nil {
 		return newEvent, errCreateEvent
+	}
+
+	_, errOpenDoor := policy.doorService.Open()
+	if errOpenDoor != nil {
+		return newEvent, errOpenDoor
 	}
 
 	_, errSendNotification := policy.telegramBotService.SendNotification(
