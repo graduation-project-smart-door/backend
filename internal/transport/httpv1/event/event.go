@@ -33,7 +33,7 @@ func (handler *Handler) Register(router *mux.Router) {
 // @Success 200 {object} domain.Event
 // @Failure 400 {object} apperror.AppError
 // @Failure 418
-// @Router /api/v1/users [post]
+// @Router /api/v1/events [post]
 func (handler *Handler) createEvent(writer http.ResponseWriter, request *http.Request) error {
 	var event dto.CreateEvent
 	if err := json.NewDecoder(request.Body).Decode(&event); err != nil {
