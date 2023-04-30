@@ -19,7 +19,7 @@ func main() {
 		fmt.Errorf("failed to create logger: %v", err)
 	}
 	defer logger.Sync() //nolint:errcheck
-	appLogger := logging.NewLogger(logger, "benches")
+	appLogger := logging.NewLogger(logger, "smart_door")
 	undoLogger := otelzap.ReplaceGlobals(appLogger)
 	defer undoLogger()
 
