@@ -15,11 +15,12 @@ import (
 
 type Handler struct {
 	httpv1.BaseHandler
-	policy Policy
+	policy      Policy
+	eventBroker EventBroker
 }
 
-func NewHandler(policy Policy) *Handler {
-	return &Handler{policy: policy}
+func NewHandler(policy Policy, eventBroker EventBroker) *Handler {
+	return &Handler{policy: policy, eventBroker: eventBroker}
 }
 
 func (handler *Handler) Register(router *mux.Router) {
@@ -80,6 +81,10 @@ func (handler *Handler) recognizeUser(writer http.ResponseWriter, request *http.
 	newEvent, errCreateEvent := handler.policy.CreateEvent(request.Context(), user.ToDomain(), user.PersonID)
 	if errCreateEvent != nil {
 		return apperror.ErrFailedToCreate
+	}
+
+	if err := handler.eventBroker.ToMessage(*newEvent); err != nil {
+		return err
 	}
 
 	handler.ResponseJSON(writer, newEvent, http.StatusCreated)

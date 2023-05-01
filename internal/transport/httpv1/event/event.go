@@ -30,7 +30,7 @@ func (handler *Handler) Register(router *mux.Router) {
 // @Tags Events
 // @Produce json
 // @Param user body dto.CreateEvent true "event info"
-// @Success 200 {object} domain.Event
+// @Success 201 {object} domain.Event
 // @Failure 400 {object} apperror.AppError
 // @Failure 418
 // @Router /api/v1/events [post]
