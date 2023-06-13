@@ -1,5 +1,5 @@
 # Build project
-FROM golang:1.19.1-alpine as builder
+FROM golang:1.20-alpine as builder
 
 WORKDIR /build
 COPY go.mod .
