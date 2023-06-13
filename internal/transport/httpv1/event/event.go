@@ -54,3 +54,20 @@ func (handler *Handler) createEvent(writer http.ResponseWriter, request *http.Re
 	handler.ResponseJSON(writer, newEvent, http.StatusCreated)
 	return nil
 }
+
+// @Summary All events
+// @Tags Events
+// @Produce json
+// @Success 200 {object} []domain.Event
+// @Failure 400 {object} apperror.AppError
+// @Failure 418
+// @Router /api/v1/events [get]
+func (handler *Handler) allUsers(writer http.ResponseWriter, request *http.Request) error {
+	all, errGetAllEvents := handler.policy.GetAllEvents(request.Context())
+	if errGetAllEvents != nil {
+		return errGetAllEvents
+	}
+
+	handler.ResponseJSON(writer, all, http.StatusOK)
+	return nil
+}

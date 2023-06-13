@@ -29,6 +29,47 @@ func NewRepository(client postgres.Client) *Repository {
 	return &Repository{client: client, queryBuilder: squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)}
 }
 
+func (repository *Repository) All(ctx context.Context) ([]*domain.User, error) {
+	sql, args, errBuild := repository.queryBuilder.Select("id", "person_id", "email", "first_name", "patronymic", "last_name",
+		"role", "phone", "password", "avatar", "position").From(tableScheme).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if errBuild != nil {
+		return nil, errBuild
+	}
+
+	rows, err := repository.client.Query(sql, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var list []*domain.User
+	for rows.Next() {
+		user := domain.User{}
+		if err = rows.Scan(
+			&user.ID,
+			&user.PersonID,
+			&user.Email,
+			&user.FirstName,
+			&user.Patronymic,
+			&user.LastName,
+			&user.Role,
+			&user.Position,
+			&user.Password,
+			&user.Avatar,
+			&user.Position,
+		); err != nil {
+			return nil, err
+		}
+
+		list = append(list, &user)
+	}
+
+	return list, nil
+}
+
 func (repository *Repository) Create(ctx context.Context, user *domain.User) (*domain.User, error) {
 	newUser := userModel{}
 	newUser.FromDomain(*user)

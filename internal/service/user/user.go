@@ -19,6 +19,16 @@ func NewService(logger logging.Logger, db Repository) *Service {
 	return &Service{logger: logger, db: db}
 }
 
+func (service *Service) GetAllUsers(ctx context.Context) ([]*domain.User, error) {
+	all, errGetAll := service.db.All(ctx)
+	if errGetAll != nil {
+		service.logger.Error("error get all users from database", zap.Error(errGetAll))
+		return nil, errGetAll
+	}
+
+	return all, nil
+}
+
 func (service *Service) CreateUser(ctx context.Context, user domain.User) (*domain.User, error) {
 	newUser, errCreateUser := service.db.Create(ctx, &user)
 	if errCreateUser != nil {

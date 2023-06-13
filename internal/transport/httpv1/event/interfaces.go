@@ -8,4 +8,5 @@ import (
 
 type Policy interface {
 	CreateEvent(ctx context.Context, event domain.Event) (*domain.Event, error)
+	GetAllEvents(ctx context.Context) ([]*domain.Event, error)
 }

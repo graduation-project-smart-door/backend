@@ -30,6 +30,10 @@ func NewPolicy(
 	}
 }
 
+func (policy *Policy) GetAllUsers(ctx context.Context) ([]*domain.User, error) {
+	return policy.userService.GetAllUsers(ctx)
+}
+
 func (policy *Policy) CreateUser(ctx context.Context, user domain.User) (*domain.User, error) {
 	return policy.userService.CreateUser(ctx, user)
 }

@@ -9,6 +9,7 @@ import (
 )
 
 type Policy interface {
+	GetAllUsers(ctx context.Context) ([]*domain.User, error)
 	CreateUser(ctx context.Context, user domain.User) (*domain.User, error)
 	CreateEvent(ctx context.Context, event domain.Event, personID uuid.UUID) (*domain.Event, error)
 }

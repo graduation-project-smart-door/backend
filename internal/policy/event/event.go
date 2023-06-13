@@ -17,3 +17,7 @@ func NewPolicy(eventService EventService) *Policy {
 func (policy *Policy) CreateEvent(ctx context.Context, event domain.Event) (*domain.Event, error) {
 	return policy.eventService.CreateEvent(ctx, event)
 }
+
+func (policy *Policy) GetAllEvents(ctx context.Context) ([]*domain.Event, error) {
+	return policy.eventService.GetAllEvents(ctx)
+}

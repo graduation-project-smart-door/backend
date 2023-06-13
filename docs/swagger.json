@@ -4,7 +4,104 @@
         "contact": {}
     },
     "paths": {
+        "/api/v1/events": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Events"
+                ],
+                "summary": "All events",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/smart-door_internal_domain.Event"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/smart-door_internal_apperror.AppError"
+                        }
+                    },
+                    "418": {
+                        "description": "I'm a teapot"
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Creating event",
+                "parameters": [
+                    {
+                        "description": "event info",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/smart-door_internal_dto.CreateEvent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/smart-door_internal_domain.Event"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/smart-door_internal_apperror.AppError"
+                        }
+                    },
+                    "418": {
+                        "description": "I'm a teapot"
+                    }
+                }
+            }
+        },
         "/api/v1/users": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "All users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/smart-door_internal_domain.User"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/smart-door_internal_apperror.AppError"
+                        }
+                    },
+                    "418": {
+                        "description": "I'm a teapot"
+                    }
+                }
+            },
             "post": {
                 "produces": [
                     "application/json"
@@ -20,7 +117,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateUser"
+                            "$ref": "#/definitions/smart-door_internal_dto.CreateUser"
                         }
                     }
                 ],
@@ -28,13 +125,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.User"
+                            "$ref": "#/definitions/smart-door_internal_domain.User"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/smart-door_internal_apperror.AppError"
                         }
                     },
                     "418": {
@@ -59,7 +156,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RecognizeUser"
+                            "$ref": "#/definitions/smart-door_internal_dto.RecognizeUser"
                         }
                     }
                 ],
@@ -67,13 +164,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Event"
+                            "$ref": "#/definitions/smart-door_internal_domain.Event"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/smart-door_internal_apperror.AppError"
                         }
                     },
                     "418": {
@@ -84,7 +181,7 @@
         }
     },
     "definitions": {
-        "apperror.AppError": {
+        "smart-door_internal_apperror.AppError": {
             "type": "object",
             "properties": {
                 "details": {
@@ -98,7 +195,7 @@
                 }
             }
         },
-        "domain.Event": {
+        "smart-door_internal_domain.Event": {
             "type": "object",
             "properties": {
                 "direction": {
@@ -115,7 +212,7 @@
                 }
             }
         },
-        "domain.User": {
+        "smart-door_internal_domain.User": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -156,7 +253,7 @@
                 }
             }
         },
-        "dto.CreateEvent": {
+        "smart-door_internal_dto.CreateEvent": {
             "type": "object",
             "properties": {
                 "direction": {
@@ -170,7 +267,7 @@
                 }
             }
         },
-        "dto.CreateUser": {
+        "smart-door_internal_dto.CreateUser": {
             "type": "object",
             "properties": {
                 "first_name": {
@@ -190,7 +287,7 @@
                 }
             }
         },
-        "dto.RecognizeUser": {
+        "smart-door_internal_dto.RecognizeUser": {
             "type": "object",
             "properties": {
                 "direction": {

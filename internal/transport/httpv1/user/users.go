@@ -90,3 +90,20 @@ func (handler *Handler) recognizeUser(writer http.ResponseWriter, request *http.
 	handler.ResponseJSON(writer, newEvent, http.StatusCreated)
 	return nil
 }
+
+// @Summary All users
+// @Tags Users
+// @Produce json
+// @Success 200 {object} []domain.User
+// @Failure 400 {object} apperror.AppError
+// @Failure 418
+// @Router /api/v1/users [get]
+func (handler *Handler) allUsers(writer http.ResponseWriter, request *http.Request) error {
+	all, errGetAllUsers := handler.policy.GetAllUsers(request.Context())
+	if errGetAllUsers != nil {
+		return errGetAllUsers
+	}
+
+	handler.ResponseJSON(writer, all, http.StatusOK)
+	return nil
+}

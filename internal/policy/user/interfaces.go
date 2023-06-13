@@ -12,6 +12,7 @@ import (
 type UserService interface {
 	CreateUser(ctx context.Context, user domain.User) (*domain.User, error)
 	GetUserByPersonID(ctx context.Context, personID uuid.UUID) (*domain.User, error)
+	GetAllUsers(ctx context.Context) ([]*domain.User, error)
 }
 
 type EventService interface {

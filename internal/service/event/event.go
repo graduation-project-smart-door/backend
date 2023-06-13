@@ -30,3 +30,7 @@ func (service *Service) CreateEvent(ctx context.Context, event domain.Event) (*d
 func (service *Service) GetLastEventByUser(ctx context.Context, userID int) (*domain.Event, error) {
 	return service.db.LastEvent(ctx, userID)
 }
+
+func (service *Service) GetAllEvents(ctx context.Context) ([]*domain.Event, error) {
+	return service.db.All(ctx)
+}

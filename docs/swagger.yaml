@@ -1,5 +1,5 @@
 definitions:
-  apperror.AppError:
+  smart-door_internal_apperror.AppError:
     properties:
       details:
         items:
@@ -8,7 +8,7 @@ definitions:
       message:
         type: string
     type: object
-  domain.Event:
+  smart-door_internal_domain.Event:
     properties:
       direction:
         type: string
@@ -19,7 +19,7 @@ definitions:
       user_id:
         type: integer
     type: object
-  domain.User:
+  smart-door_internal_domain.User:
     properties:
       avatar:
         type: string
@@ -46,7 +46,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  dto.CreateEvent:
+  smart-door_internal_dto.CreateEvent:
     properties:
       direction:
         type: string
@@ -55,7 +55,7 @@ definitions:
       user_id:
         type: integer
     type: object
-  dto.CreateUser:
+  smart-door_internal_dto.CreateUser:
     properties:
       first_name:
         type: string
@@ -68,7 +68,7 @@ definitions:
       position:
         type: string
     type: object
-  dto.RecognizeUser:
+  smart-door_internal_dto.RecognizeUser:
     properties:
       direction:
         type: string
@@ -80,7 +80,70 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/v1/events:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/smart-door_internal_domain.Event'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/smart-door_internal_apperror.AppError'
+        "418":
+          description: I'm a teapot
+      summary: All events
+      tags:
+      - Events
+    post:
+      parameters:
+      - description: event info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/smart-door_internal_dto.CreateEvent'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/smart-door_internal_domain.Event'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/smart-door_internal_apperror.AppError'
+        "418":
+          description: I'm a teapot
+      summary: Creating event
+      tags:
+      - Events
   /api/v1/users:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/smart-door_internal_domain.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/smart-door_internal_apperror.AppError'
+        "418":
+          description: I'm a teapot
+      summary: All users
+      tags:
+      - Users
     post:
       parameters:
       - description: user info
@@ -88,18 +151,18 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateUser'
+          $ref: '#/definitions/smart-door_internal_dto.CreateUser'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.User'
+            $ref: '#/definitions/smart-door_internal_domain.User'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/smart-door_internal_apperror.AppError'
         "418":
           description: I'm a teapot
       summary: Creating a regular user
@@ -113,18 +176,18 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/dto.RecognizeUser'
+          $ref: '#/definitions/smart-door_internal_dto.RecognizeUser'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.Event'
+            $ref: '#/definitions/smart-door_internal_domain.Event'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/smart-door_internal_apperror.AppError'
         "418":
           description: I'm a teapot
       summary: Recognize user

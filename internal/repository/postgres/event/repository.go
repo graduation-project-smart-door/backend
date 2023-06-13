@@ -57,9 +57,45 @@ func (repository *Repository) Create(ctx context.Context, event *domain.Event) (
 	return eventModelToDomain(newEvent), nil
 }
 
+func (repository *Repository) All(ctx context.Context) ([]*domain.Event, error) {
+	sql, args, errBuild := repository.queryBuilder.
+		Select("id", "direction", "user_id", "event_time").
+		From(tableScheme).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if errBuild != nil {
+		return nil, errBuild
+	}
+
+	rows, err := repository.client.Query(sql, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var list []*domain.Event
+	for rows.Next() {
+		event := domain.Event{}
+		if err = rows.Scan(
+			&event.ID,
+			&event.Direction,
+			&event.UserID,
+			&event.EventTime,
+		); err != nil {
+			return nil, err
+		}
+
+		list = append(list, &event)
+	}
+
+	return list, nil
+}
+
 func (repository *Repository) LastEvent(ctx context.Context, userID int) (*domain.Event, error) {
 	query, args, errBuild := repository.queryBuilder.
-		Select("id", "direction", "user_id", "event_time").
+		Select("id", "direction", "user_id", "event_time").From(tableScheme).
 		Where("user_id = ?", userID).
 		OrderBy("event_time DESC").
 		PlaceholderFormat(squirrel.Dollar).
