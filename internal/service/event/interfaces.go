@@ -8,4 +8,5 @@ import (
 
 type Repository interface {
 	Create(ctx context.Context, event *domain.Event) (*domain.Event, error)
+	LastEvent(ctx context.Context, userID int) (*domain.Event, error)
 }

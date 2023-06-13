@@ -26,3 +26,7 @@ func (service *Service) CreateEvent(ctx context.Context, event domain.Event) (*d
 
 	return newEvent, nil
 }
+
+func (service *Service) GetLastEventByUser(ctx context.Context, userID int) (*domain.Event, error) {
+	return service.db.LastEvent(ctx, userID)
+}

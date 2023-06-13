@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"time"
 
 	"smart-door/internal/domain"
 	"smart-door/internal/dto"
@@ -50,15 +51,24 @@ func (policy *Policy) CreateEvent(ctx context.Context, event domain.Event, perso
 		return newEvent, errOpenDoor
 	}
 
-	_, errSendNotification := policy.telegramBotService.SendNotification(
-		dto.NewEventNotification(
-			user.FirstName,
-			user.LastName,
-			event.Direction,
-		),
-	)
-	if errSendNotification != nil {
-		return newEvent, errSendNotification
+	lastEvent, errGetLastEvent := policy.eventService.GetLastEventByUser(ctx, user.ID)
+	if errGetLastEvent != nil {
+		return nil, errOpenDoor
+	}
+
+	minimumInterval := time.Now().Add(-12 * time.Hour)
+	if lastEvent.EventTime.Before(minimumInterval) {
+		_, errSendNotification := policy.telegramBotService.SendNotification(
+			dto.NewEventNotification(
+				user.FirstName,
+				user.LastName,
+				event.Direction,
+			),
+		)
+
+		if errSendNotification != nil {
+			return newEvent, errSendNotification
+		}
 	}
 
 	return newEvent, nil

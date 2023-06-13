@@ -16,6 +16,7 @@ type UserService interface {
 
 type EventService interface {
 	CreateEvent(ctx context.Context, event domain.Event) (*domain.Event, error)
+	GetLastEventByUser(ctx context.Context, userID int) (*domain.Event, error)
 }
 
 type TelegramBotService interface {
