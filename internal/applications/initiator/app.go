@@ -10,6 +10,7 @@ import (
 
 	_ "smart-door/docs"
 	"smart-door/internal/config"
+	eventPolicy "smart-door/internal/policy/event"
 	userPolicy "smart-door/internal/policy/user"
 	eventRepository "smart-door/internal/repository/postgres/event"
 	userRepository "smart-door/internal/repository/postgres/user"
@@ -17,6 +18,7 @@ import (
 	eventService "smart-door/internal/service/event"
 	"smart-door/internal/service/telegrambot"
 	userService "smart-door/internal/service/user"
+	eventHandler "smart-door/internal/transport/httpv1/event"
 	userHandlers "smart-door/internal/transport/httpv1/user"
 	eventHandlersSSE "smart-door/internal/transport/ssev1/event"
 	"smart-door/pkg/auth"
@@ -125,6 +127,9 @@ func NewApp(config *config.Config, logger logging.Logger) (*App, error) {
 	appEventService := eventService.NewService(logger, appEventRepository)
 	appEventBroker := eventHandlersSSE.NewBroker()
 	appEventBroker.Register(appEventRouter)
+	appEventPolicy := eventPolicy.NewPolicy(appEventService)
+	appEventHandler := eventHandler.NewHandler(appEventPolicy)
+	appEventHandler.Register(appEventRouter)
 
 	// Пользователи
 	logger.Info("user application initializing")
